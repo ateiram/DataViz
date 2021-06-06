@@ -1,6 +1,6 @@
 ### Bike Sharing in Boston
 
-####Background
+#### Background
 
 A bicycle-sharing system, or public bike share(PBS) scheme,is a shared transport service in which bicycles are made available for shared use to individuals on a short term basis for a price or free. Bluebikesis Metro Boston's public bike share program,with more than 1,800 bikes at over 200stations. The bikes can be unlocked from one station and returned to any other station in the system, making them ideal for one-way trips.
 
@@ -23,5 +23,5 @@ The dataset includes:
 - End station latitude and longitude (geospatial)
 
 
-####Outcomes
+#### Outcomes
 Expected impacts and benefits of the proposed project will be the valuable insights taken from the visualizations and EDA. Having insights on mobilitypatterns, speed, travel time & roadnetwork performance from the local bike-sharing programs(and/or Taxi apps) will give an opportunity of further study of urban road traffic and infrastructure adjustments
