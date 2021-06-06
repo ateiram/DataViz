@@ -24,10 +24,10 @@ plotly_template = pio.templates.default = "simple_white"
 
 app = dash.Dash(external_stylesheets=external_stylesheets)
 
-df19 = pd.read_csv('data/bluebikes_tripdata_2019_copy.csv',
+df19 = pd.read_csv('data/bluebikes_tripdata_2019.csv',
                    parse_dates=['starttime', 'stoptime'])
 
-df20 = pd.read_csv('data/bluebikes_tripdata_2020_copy.csv',
+df20 = pd.read_csv('data/bluebikes_tripdata_2020.csv',
                    parse_dates=['starttime', 'stoptime'])
 
 df = pd.concat([df19, df20])
@@ -75,16 +75,20 @@ df['log_duration'] = np.log(df['duration'])
 figure_5 = ff.create_distplot([df[df['year'] == 2020].log_duration, df[df['year'] == 2019].log_duration],
                               ['2020', '2019'], show_hist=False, show_rug=False, colors=colors2)
 
-# figure_5.update_layout(
-# xaxis = dict(
-#         tickmode = 'array',
-#         tickvals = df.log_duration,
-#         ticktext = [min(df['duration']), np.quantile(df['duration'],0.25),
-#                     np.quantile(df['duration'],0.5),
-#                     np.quantile(df['duration'],0.75)
-#                     ]
-#     )
-# )
+figure_5.update_layout(
+
+    xaxis = dict(
+        tickmode = 'array',
+         tickvals = [0, 5, 6,7,8, 9, 14],
+         ticktext = [np.exp(0), round(np.exp(5)/60,0), round(np.exp(6)/60,0),
+                     round(np.exp(7)/60,0),round(np.exp(8)/60,0),
+                     round(np.exp(9)/60,0), round(np.exp(14)/60,0)],
+         title='Duration (minutes)'
+    ),
+        yaxis = dict(
+         title='Frequency'
+    )
+ )
 
 figure_6 = go.Figure(
     go.Scattermapbox(
@@ -113,20 +117,24 @@ config = {"displayModeBar": False}
 app.layout = html.Div([
     html.Div(children=
     [
-        html.H1(children='BLUEBIKES Bike Sharing', className='my-3 p-3 justify-content-lg-start'),
+    html.Div([
+        html.H1(children='BLUEBIKES Bike Sharing', className='my-3 p-3 justify-content-lg-start',
+                ),
         html.H3(children="Bluebikes is Metro Boston's public bike share program,with more than 1,800"
                          " bikes at over 200stations. The bikes can be unlocked from one station and"
                          " returned to any other station in the system, making them ideal for one-way trips.",
                 className='my-3 p-3'),
-
+    ],className='container bg-dark text-light', style={'background-color': '#68b0ab',
+                                    'border-radius': '25px'
+                       })
     ], className=' p-4 p-md-4 text-dark rounded bg-white'),
 
     html.Div([
-        html.Div([html.H4(children="Number of Bikes Used"),
+        html.Div([html.H4(children="Number of Bikes Used", className='display-4'),
                   dcc.Graph(figure=figure_1, config=config)], className='col-md-4'),
-        html.Div([html.H4(children="Number of Rides"),
+        html.Div([html.H4(children="Number of Rides", className='display-4'),
                   dcc.Graph(figure=figure_2, config=config)], className='col-md-4'),
-        html.Div([html.H4(children="Number of Stations"),
+        html.Div([html.H6(children="Number of Stations", className='display-4'),
                   dcc.Graph(figure=figure_3, config=config)], className='col-md-4')
     ], className='row p-3 p-md-5'),
 
@@ -139,7 +147,7 @@ app.layout = html.Div([
 
     html.Div([
         html.Div([
-            html.H4(children="Log-Duration of Rides", className='display-4'),
+            html.H4(children="Distribution of Log-Duration of Rides", className='display-4'),
             dcc.Graph(figure=figure_5, config=config)], className='eight columns'),
 
     ], className='row p-3 p-md-5 justify-content-center '),
@@ -183,7 +191,8 @@ app.layout = html.Div([
             html.H4(children="Stations in Boston", className='display-4'),
             dcc.Graph(figure=figure_6, config=config)], className=' eight columns box-shadow'),
 
-    ], className='row justify-content-center '),
+    ],
+        className='row justify-content-center '),
 
 ], className='position-relative overflow-hidden bg-light')
 
@@ -203,9 +212,34 @@ def update_graph(value1, value2):
     means = df.groupby(by=value1).mean()
     means.reset_index(inplace=True)
     if value2 == 'dur':
-        figure_7 = go.Figure(data=go.Bar(x=means[value1], y=means['duration'], marker_color=colors1[1]))
+        figure_7 = go.Figure(data=go.Bar(x=means[value1], y=means['duration'],
+                                         marker_color=colors1[1]))
     elif value2 == 'counts':
-        figure_7 = go.Figure(data=go.Bar(x=counts.index, y=counts.values, marker_color=colors1[1]))
+        figure_7 = go.Figure(data=go.Bar(x=counts.index, y=counts.values,
+                                         marker_color=colors1[1]))
+
+    if value1 == 'hour':
+        xlabel='Hours of the Day'
+    if value1 == 'month':
+        xlabel='Months of the Year'
+    if value1 == 'weekday':
+        xlabel = 'Days of the Week'
+
+    if value2 == 'dur':
+        ylabel = 'Avergae Duration of a Ride'
+    if value2 == 'counts':
+        ylabel = 'Number of Rides'
+
+
+        figure_7.update_layout(
+
+            xaxis=dict(
+                title=xlabel
+            ),
+            yaxis=dict(
+                title=ylabel
+            )
+        )
 
     return figure_7
 
